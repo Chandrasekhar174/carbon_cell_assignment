@@ -3,6 +3,8 @@ package com.chandrasekahr.Spring_security_JWT.service;
 import com.chandrasekahr.Spring_security_JWT.entity.UserInfo;
 import com.chandrasekahr.Spring_security_JWT.repository.UserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,11 +21,15 @@ public class UserInfoService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder encoder;
-    public String addUser(UserInfo userInfo) {
-
+    public ResponseEntity<String> addUser(UserInfo userInfo) {
+        Optional<UserInfo> userInfo1=userInfoRepository.findByEmail(userInfo.getEmail());
+        if(!userInfo1.isEmpty())
+        {
+            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body("Already this email_id present please login");
+        }
         userInfo.setPassword(encoder.encode(userInfo.getPassword()));
         userInfoRepository.save(userInfo);
-        return "user added successfully";
+        return ResponseEntity.ok("Registration successfully");
     }
 
     @Override
@@ -32,15 +38,5 @@ public class UserInfoService implements UserDetailsService {
 
         return userDetails.map(UserInfoDetails::new).orElseThrow(()->new UsernameNotFoundException("user not found"+username));
     }
-
-//    public String fetchAllData() {
-//        String apiUrl="https://api.publicapis.org/entries";
-//
-//
-//        return restTemplate.getForObject(apiUrl,String.class);
-//    }
-
-
-
 
 }

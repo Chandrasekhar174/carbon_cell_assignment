@@ -8,6 +8,7 @@ import com.chandrasekahr.Spring_security_JWT.service.Jwtservice;
 import com.chandrasekahr.Spring_security_JWT.service.UserInfoService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,14 +32,8 @@ public class UserController {
     @Autowired
     private DataEntryService dataEntryService;
 
-    @GetMapping("/home")
-    public String getUser()
-    {
-        return "This is home page";
-
-    }
     @PostMapping("/registration")
-    public String registration(@RequestBody UserInfo userInfo)
+    public ResponseEntity<String> registration(@RequestBody UserInfo userInfo)
     {
         return service.addUser(userInfo);
     }
@@ -46,6 +41,7 @@ public class UserController {
     public String login(@RequestBody AuthRequest authRequest)
     {
         Authentication authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(),authRequest.getPassword()));
+
         if(authentication.isAuthenticated())
         {
             return jwtservice.generateToken(authRequest.getEmail());
